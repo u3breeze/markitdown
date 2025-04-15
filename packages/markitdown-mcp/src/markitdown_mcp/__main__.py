@@ -1,3 +1,4 @@
+import logging
 import sys
 from typing import Any
 from mcp.server.fastmcp import FastMCP
@@ -8,6 +9,8 @@ from starlette.routing import Mount, Route
 from mcp.server import Server
 from markitdown import MarkItDown
 import uvicorn
+
+logger = logging.getLogger("markitdown-mcp")
 
 # Initialize FastMCP server for MarkItDown (SSE)
 mcp = FastMCP("markitdown")
@@ -23,7 +26,6 @@ app = Starlette(
         Mount('/', app=mcp.sse_app()),
     ]
 )
-
 
 # def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlette:
 #     sse = SseServerTransport("/messages/")
@@ -47,7 +49,8 @@ app = Starlette(
 #             Mount("/messages/", app=sse.handle_post_message),
 #         ],
 #     )
-
+#
+#
 # # Main entry point
 # def main():
 #     import argparse
@@ -74,6 +77,7 @@ app = Starlette(
 #         sys.exit(1)
 #
 #     if args.sse:
+#         logger.info("Running MarkItDown server with SSE transport")
 #         starlette_app = create_starlette_app(mcp_server, debug=True)
 #         uvicorn.run(
 #             starlette_app,
@@ -81,6 +85,7 @@ app = Starlette(
 #             port=args.port if args.port else 3001,
 #         )
 #     else:
+#         logger.info("Running MarkItDown server with STDIO transport")
 #         mcp.run()
 #
 #

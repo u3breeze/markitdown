@@ -43,41 +43,44 @@ def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlett
     )
 
 
-# Main entry point
-def main():
-    import argparse
+mcp_server = mcp._mcp_server
+starlette_app = create_starlette_app(mcp_server, debug=True)
 
-    mcp_server = mcp._mcp_server
-
-    parser = argparse.ArgumentParser(description="Run MCP SSE-based MarkItDown server")
-
-    parser.add_argument(
-        "--sse",
-        action="store_true",
-        help="Run the server with SSE transport rather than STDIO (default: False)",
-    )
-    parser.add_argument(
-        "--host", default=None, help="Host to bind to (default: 127.0.0.1)"
-    )
-    parser.add_argument(
-        "--port", type=int, default=None, help="Port to listen on (default: 3001)"
-    )
-    args = parser.parse_args()
-
-    if not args.sse and (args.host or args.port):
-        parser.error("Host and port arguments are only valid when using SSE transport.")
-        sys.exit(1)
-
-    if args.sse:
-        starlette_app = create_starlette_app(mcp_server, debug=True)
-        uvicorn.run(
-            starlette_app,
-            host=args.host if args.host else "127.0.0.1",
-            port=args.port if args.port else 3001,
-        )
-    else:
-        mcp.run()
-
-
-if __name__ == "__main__":
-    main()
+# # Main entry point
+# def main():
+#     import argparse
+#
+#     mcp_server = mcp._mcp_server
+#
+#     parser = argparse.ArgumentParser(description="Run MCP SSE-based MarkItDown server")
+#
+#     parser.add_argument(
+#         "--sse",
+#         action="store_true",
+#         help="Run the server with SSE transport rather than STDIO (default: False)",
+#     )
+#     parser.add_argument(
+#         "--host", default=None, help="Host to bind to (default: 127.0.0.1)"
+#     )
+#     parser.add_argument(
+#         "--port", type=int, default=None, help="Port to listen on (default: 3001)"
+#     )
+#     args = parser.parse_args()
+#
+#     if not args.sse and (args.host or args.port):
+#         parser.error("Host and port arguments are only valid when using SSE transport.")
+#         sys.exit(1)
+#
+#     if args.sse:
+#         starlette_app = create_starlette_app(mcp_server, debug=True)
+#         uvicorn.run(
+#             starlette_app,
+#             host=args.host if args.host else "127.0.0.1",
+#             port=args.port if args.port else 3001,
+#         )
+#     else:
+#         mcp.run()
+#
+#
+# if __name__ == "__main__":
+#     main()

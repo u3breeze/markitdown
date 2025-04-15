@@ -18,33 +18,35 @@ async def convert_to_markdown(uri: str) -> str:
     """Convert a resource described by an http:, https:, file: or data: URI to markdown"""
     return MarkItDown().convert_uri(uri).markdown
 
-
-def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlette:
-    sse = SseServerTransport("/messages/")
-
-    async def handle_sse(request: Request) -> None:
-        async with sse.connect_sse(
-            request.scope,
-            request.receive,
-            request._send,
-        ) as (read_stream, write_stream):
-            await mcp_server.run(
-                read_stream,
-                write_stream,
-                mcp_server.create_initialization_options(),
-            )
-
-    return Starlette(
-        debug=debug,
-        routes=[
-            Route("/sse", endpoint=handle_sse),
-            Mount("/messages/", app=sse.handle_post_message),
-        ],
-    )
+app = Starlette(
+    routes=[
+        Mount('/', app=mcp.sse_app()),
+    ]
+)
 
 
-mcp_server = mcp._mcp_server
-starlette_app = create_starlette_app(mcp_server, debug=True)
+# def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlette:
+#     sse = SseServerTransport("/messages/")
+#
+#     async def handle_sse(request: Request) -> None:
+#         async with sse.connect_sse(
+#             request.scope,
+#             request.receive,
+#             request._send,
+#         ) as (read_stream, write_stream):
+#             await mcp_server.run(
+#                 read_stream,
+#                 write_stream,
+#                 mcp_server.create_initialization_options(),
+#             )
+#
+#     return Starlette(
+#         debug=debug,
+#         routes=[
+#             Route("/sse", endpoint=handle_sse),
+#             Mount("/messages/", app=sse.handle_post_message),
+#         ],
+#     )
 
 # # Main entry point
 # def main():
